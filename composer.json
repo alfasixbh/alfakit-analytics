@@ -1,0 +1,91 @@
+{
+  "name": "alfasix/alfakit-analytics",
+  "description": "Privacy-first web analytics for the public site of a Laravel app, viewed in an AlfaKit panel: a cookieless tracking snippet, server-side tracking, daily rollups, goals and a dashboard with filters, comparisons and realtime visitors.",
+  "keywords": [
+    "laravel",
+    "alfakit",
+    "analytics",
+    "privacy",
+    "cookieless",
+    "plausible",
+    "web-analytics"
+  ],
+  "homepage": "https://alfakit.dev/docs/plugins/analytics",
+  "type": "library",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Alfa Six",
+      "homepage": "https://alfasixbh.com",
+      "role": "Developer"
+    }
+  ],
+  "support": {
+    "issues": "https://github.com/alfasixbh/alfakit/issues",
+    "source": "https://github.com/alfasixbh/alfakit"
+  },
+  "require": {
+    "php": "^8.3",
+    "alfasix/alfakit": "^0.1|@dev"
+  },
+  "suggest": {
+    "geoip2/geoip2": "Resolve visitor countries from a MaxMind GeoLite2 / GeoIP2 database (see the docs for a resolver)."
+  },
+  "autoload": {
+    "psr-4": {
+      "AlfaSix\\AlfakitAnalytics\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "AlfaSix\\AlfakitAnalytics\\Tests\\": "tests/"
+    }
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "AlfaSix\\AlfakitAnalytics\\AlfakitAnalyticsServiceProvider"
+      ]
+    },
+    "alfakit": {
+      "version": "^0.1",
+      "frontend": null,
+      "showcase": {
+        "demoPath": "analytics",
+        "tour": [
+          "Open Marketing > Analytics",
+          "Switch the period and compare",
+          "Click a top page to filter",
+          "Share a read-only dashboard link"
+        ],
+        "clips": [
+          "react-light",
+          "react-dark",
+          "vue-light",
+          "vue-dark",
+          "svelte-light",
+          "svelte-dark"
+        ],
+        "worksWith": [
+          "cms",
+          "forms",
+          "feature-flags"
+        ],
+        "highlights": [
+          "Cookieless tracking snippet",
+          "React, Vue and Svelte page-view components",
+          "Server-side tracking and middleware",
+          "Daily rollups and retention",
+          "Goals, comparisons and realtime visitors",
+          "Public, signed shared dashboards",
+          "Tenant-scoped sites"
+        ]
+      }
+    }
+  },
+  "config": {
+    "sort-packages": true
+  },
+  "minimum-stability": "stable",
+  "prefer-stable": true
+}

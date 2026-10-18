@@ -1,0 +1,7 @@
+# Changelog
+
+All notable changes to `alfasix/alfakit-analytics` are documented in this file.
+
+## Unreleased
+
+- Initial release: privacy-first, cookieless analytics for an app's public site, viewed in an AlfaKit panel. A tracking snippet under 2 KB (`@alfakitAnalytics`, `Analytics::script()`) and `<AlfakitAnalytics />` components for React, Vue and Svelte with `trackAnalyticsEvent()`; a stateless, rate-limited collection endpoint; server-side `Analytics::track()` / `pageview()` and the `alfakit-analytics` middleware. Visitors are a daily-salted HMAC of site, IP and user agent (salts rotate every UTC day and old ones are deleted; IPs and user agents are never stored). Do Not Track / GPC respected, bot filtering, referrer, channel and UTM parsing, browser / OS / device detection, countries through a `ResolvesCountry` contract or a CDN header. Raw visits and events with daily rollups (`alfakit-analytics:aggregate`, scheduled hourly) and retention settings on MySQL, PostgreSQL and SQLite. A dashboard with "visitors now" (realtime or polling), KPIs, a comparable chart, click-to-filter top lists (pages, entry / exit pages, sources, channels, referrers, UTM, countries, devices, browsers, OS, custom events with property breakdowns, goals with conversion rates), a period picker, top-list exports through the exporter, tenant-scoped sites with goals, `authorize()` and `Site` policy support, and signed, revocable shared dashboards.
