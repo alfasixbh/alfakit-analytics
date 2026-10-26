@@ -10,6 +10,8 @@ use AlfaSix\AlfakitAnalytics\Models\EventProperty;
 use AlfaSix\AlfakitAnalytics\Models\Site;
 use AlfaSix\AlfakitAnalytics\Models\Visit;
 use Carbon\CarbonImmutable;
+use Illuminate\Database\DeadlockException;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
 use Throwable;
 
@@ -50,7 +52,7 @@ class Recorder
         $visitor = VisitorHash::make($site, $hit->ip, $hit->userAgent);
         $isPageview = $name === Event::PAGEVIEW;
 
-        return DB::transaction(function () use ($site, $hit, $name, $page, $agent, $occurredAt, $local, $visitor, $isPageview): Event {
+        $store = function () use ($site, $hit, $name, $page, $agent, $occurredAt, $local, $visitor, $isPageview): Event {
             $visit = $this->findOpenVisit($site, $visitor, $occurredAt);
 
             if ($visit === null) {
@@ -120,7 +122,22 @@ class Recorder
             }
 
             return $event;
-        });
+        };
+
+        // SQLite refuses a second writer at once ("database is locked", without waiting when a
+        // read inside the transaction has to become a write), so of two hits of one visitor close
+        // together one was lost. Try again shortly, a few times.
+        for ($attempt = 1; ; $attempt++) {
+            try {
+                return DB::transaction($store);
+            } catch (QueryException|DeadlockException $e) {
+                if ($attempt >= 3 || ! str_contains($e->getMessage(), 'database is locked')) {
+                    throw $e;
+                }
+
+                usleep(50_000 * $attempt);
+            }
+        }
     }
 
     public function shouldRecord(Hit $hit): bool

@@ -410,3 +410,29 @@ it('records nothing without a site', function (): void {
     expect(Analytics::track('Signup'))->toBeNull()
         ->and(Analytics::site('missing'))->toBeNull();
 });
+
+it('retries a hit when SQLite reports the database as locked', function (): void {
+    $site = site();
+    $calls = 0;
+
+    app()->instance(AlfaSix\AlfakitAnalytics\Support\Recorder::class, new class($calls) extends AlfaSix\AlfakitAnalytics\Support\Recorder
+    {
+        public function __construct(private int &$calls)
+        {
+            parent::__construct(app(ResolvesCountry::class));
+        }
+
+        protected function findOpenVisit(AlfaSix\AlfakitAnalytics\Models\Site $site, string $visitor, CarbonImmutable $occurredAt): ?Visit
+        {
+            if ($this->calls++ === 0) {
+                throw new Illuminate\Database\QueryException('sqlite', 'update "alfakit_analytics_visits" …', [], new PDOException('SQLSTATE[HY000]: General error: 5 database is locked'));
+            }
+
+            return parent::findOpenVisit($site, $visitor, $occurredAt);
+        }
+    });
+
+    expect(hit($site))->not->toBeNull()
+        ->and($calls)->toBe(2)
+        ->and(Visit::query()->count())->toBe(1);
+});
