@@ -212,7 +212,7 @@ class AnalyticsPlugin implements Plugin
 
     public function isAuthorized(): bool
     {
-        return $this->authorizeUsing === null || (bool) $this->evaluate($this->authorizeUsing);
+        return $this->authorizeUsing === null || $this->evaluateUserAuthorization($this->authorizeUsing);
     }
 
     /**
@@ -307,7 +307,7 @@ class AnalyticsPlugin implements Plugin
 
     public function canShare(): bool
     {
-        return (bool) $this->evaluate($this->canShare);
+        return $this->evaluateUserAuthorization($this->canShare);
     }
 
     /**
