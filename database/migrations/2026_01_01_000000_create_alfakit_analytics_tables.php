@@ -104,7 +104,8 @@ return new class extends Migration
             $table->string('key', 64);
             $table->string('value', 256);
 
-            $table->index(['site_id', 'date', 'event_name', 'key']);
+            // Named: the generated name is over MySQL's 64 characters.
+            $table->index(['site_id', 'date', 'event_name', 'key'], 'alfakit_analytics_event_properties_lookup_index');
         });
 
         /*

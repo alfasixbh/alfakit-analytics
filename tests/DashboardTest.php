@@ -247,7 +247,14 @@ it('serves the shared dashboard from a signed link and revokes it', function ():
 
     // Expiring links work until they expire.
     $temporary = (string) Analytics::shareUrl($site, now()->addHour());
-    analyticsTest()->get($temporary.'&period=today')->assertOk();
+    $page = analyticsTest()->get($temporary.'&period=today')->assertOk();
+
+    // The period and filter links on that page expire with it (not decades later).
+    preg_match_all('/expires=(\d+)/', html_entity_decode((string) $page->getContent()), $matches);
+
+    expect($matches[1])->not->toBeEmpty()
+        ->and(array_unique($matches[1]))->toBe([(string) now()->addHour()->getTimestamp()]);
+
     Carbon::setTestNow(now()->addHours(2));
     analyticsTest()->get($temporary)->assertForbidden();
     Carbon::setTestNow('2026-10-15 12:00:00');

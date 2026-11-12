@@ -131,7 +131,14 @@ class Recorder
             try {
                 return DB::transaction($store);
             } catch (QueryException|DeadlockException $e) {
-                if ($attempt >= 3 || ! str_contains($e->getMessage(), 'database is locked')) {
+                // SQLite's "database is locked", and the deadlock two first hits of one visitor
+                // cause on MySQL (both lock the gap of a visit that doesn't exist yet).
+                $concurrent = $e instanceof DeadlockException
+                    || str_contains($e->getMessage(), 'database is locked')
+                    || str_contains($e->getMessage(), 'Deadlock found')
+                    || str_contains($e->getMessage(), 'Lock wait timeout');
+
+                if ($attempt >= 3 || ! $concurrent) {
                     throw $e;
                 }
 

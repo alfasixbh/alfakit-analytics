@@ -11,6 +11,7 @@ use AlfaSix\AlfakitAnalytics\Support\Period;
 use AlfaSix\AlfakitAnalytics\Support\Report;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\URL;
 
 /**
@@ -62,7 +63,9 @@ class SharedDashboardController
         // Links keep their signature (and expiry) while the period and filters change.
         $report = Report::fromQuery($model, $request->query(), static function (array $query) use ($signed, $expires): string {
             $url = is_numeric($expires)
-                ? URL::temporarySignedRoute('alfakit-analytics.share', (int) $expires, $signed)
+                // A date, not the number: an integer here is a delay in seconds from now, which
+                // made the links on an expiring page valid for decades.
+                ? URL::temporarySignedRoute('alfakit-analytics.share', Carbon::createFromTimestamp((int) $expires), $signed)
                 : URL::signedRoute('alfakit-analytics.share', $signed);
 
             return $query === [] ? $url : $url.'&'.http_build_query($query);
