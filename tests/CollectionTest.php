@@ -111,7 +111,8 @@ it('keeps only the path and campaign parameters of page URLs', function (): void
 
 it('stores no IP address, user agent, query string or other personal data', function (): void {
     $site = site();
-    hit($site, 'https://example.com/account?email=ada%40example.com&token=s3cret', referrer: 'https://news.example.org/item?id=42&user=ada', ip: '198.51.100.23');
+    // A name no hexadecimal visitor hash can contain by chance.
+    hit($site, 'https://example.com/account?email=grace%40example.com&token=s3cret', referrer: 'https://news.example.org/item?id=42&user=grace', ip: '198.51.100.23');
 
     $dump = json_encode([
         DB::table('alfakit_analytics_visits')->get(),
@@ -120,7 +121,7 @@ it('stores no IP address, user agent, query string or other personal data', func
 
     expect($dump)->not->toContain('198.51.100.23')
         ->not->toContain('Mozilla')
-        ->not->toContain('ada')
+        ->not->toContain('grace')
         ->not->toContain('s3cret')
         ->not->toContain('id=42')
         ->and(Visit::query()->sole()->visitor)->toMatch('/^[0-9a-f]{16}$/')
